@@ -1,53 +1,60 @@
-package main.game;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+package main.game.Screens;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import main.game.GamMenu;
 
-public class Main extends ApplicationAdapter {
+public class ScrMovement implements Screen {
+	GamMenu gamMenu;
 	SpriteBatch batch;
-	Texture Idle1, Idle2, Walk1, Walk2, Crouch, Jump, Dead, Active;
-	Texture PunchStraight1, PunchStraight2, PunchDown, PunchUp;
-	Texture BlockUp, BlockStraight, BlockDown;
-	Texture KickStraight1, KickStraight2, KickJump, KickLow1, KickLow2;
+	Texture txIdle1, txIdle2, txWalk1, txWalk2, txCrouch, txJump, txDead, txActive;
+	Texture txPunchStraight1, txPunchStraight2, txPunchDown, txPunchUp;
+	Texture txBlockUp, txBlockStraight, txBlockDown;
+	Texture txKickStraight1, txKickStraight2, txKickJump, txKickLow1, txKickLow2;
+	Texture txBackground;
 	int nFrame = 0, nIdle = 0, nX = 250, nY = 50, nHealth = 3; //Hero's variables
 	boolean isRight = true;
 	int nPunchStraight = 0, nPunchUp = 0, nPunchDown = 0, nKickStraight = 0, nKickDown = 0, nJump = 0,
 			nBlockStraight = 0, nBlockUp = 0, nBlockDown = 0; //Counts for moves
-	
-	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		Active = new Texture ("Idle1.png");
-		Idle1 = new Texture ("Idle1.png");
-		Idle2 = new Texture ("Idle2.png");
-		Walk1 = new Texture ("Walk1.png");
-		Walk2 = new Texture ("Walk2.png");
-		Crouch = new Texture ("Crouch.png");
-		Jump = new Texture ("Crouch.png");
-		Dead = new Texture ("Dead.png");
-		PunchStraight1 = new Texture ("PunchStraight1.png");
-		PunchStraight2 = new Texture ("PunchStraight2.png");
-		PunchDown = new Texture ("PunchDown.png");
-		PunchUp = new Texture ("PunchUp.png");
-		BlockStraight = new Texture ("BlockStraight.png");
-		BlockDown = new Texture ("BlockDown.png");
-		BlockUp = new Texture ("BlockUp.png");
-		KickStraight1 = new Texture ("KickStraight1.png");
-		KickStraight2 = new Texture ("KickStraight2.png");
-		KickJump = new Texture ("KickJump.png");
-		KickLow1 = new Texture ("KickLow1.png");
-		KickLow2 = new Texture ("KickLow2.png");
+
+	public ScrMovement(GamMenu _GamMenu) {  //Referencing the main class.
+		gamMenu = _GamMenu;
 	}
 
 	@Override
-	public void render () {
+	public void show() {
+		batch = new SpriteBatch();
+		txActive = new Texture ("Idle1.png");
+		txIdle1 = new Texture ("Idle1.png");
+		txIdle2 = new Texture ("Idle2.png");
+		txWalk1 = new Texture ("Walk1.png");
+		txWalk2 = new Texture ("Walk2.png");
+		txCrouch = new Texture ("Crouch.png");
+		txJump = new Texture ("Crouch.png");
+		txDead = new Texture ("Dead.png");
+		txPunchStraight1 = new Texture ("PunchStraight1.png");
+		txPunchStraight2 = new Texture ("PunchStraight2.png");
+		txPunchDown = new Texture ("PunchDown.png");
+		txPunchUp = new Texture ("PunchUp.png");
+		txBlockStraight = new Texture ("BlockStraight.png");
+		txBlockDown = new Texture ("BlockDown.png");
+		txBlockUp = new Texture ("BlockUp.png");
+		txKickStraight1 = new Texture ("KickStraight1.png");
+		txKickStraight2 = new Texture ("KickStraight2.png");
+		txKickJump = new Texture ("KickJump.png");
+		txKickLow1 = new Texture ("KickLow1.png");
+		txKickLow2 = new Texture ("KickLow2.png");
+		txBackground = new Texture ("Background.jpg");
+	}
+
+	@Override
+	public void render (float delta) {
 		Gdx.gl.glClearColor(0, 0, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) gamMenu.updateState(0);
+		batch.draw(txBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		nFrame = 0;
 		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && nX <= 540) {
 			nFrame = 1;
@@ -96,22 +103,8 @@ public class Main extends ApplicationAdapter {
 			}
 
 		}
-		if (nJump > 44){
-			if (Gdx.input.isKeyPressed(Input.Keys.Q)){
-				nPunchUp = 49;
-				nJump = 0;
-			}
-			else if (Gdx.input.isKeyPressed(Input.Keys.W)){
-				nBlockUp = 49;
-				nJump = 0;
-			}
-			if (nJump > 0 && Gdx.input.isKeyPressed(Input.Keys.E)){
-				nFrame = 14;
-			}
-		}
-
 		//Jumping structures
-		if (nJump <= 44 && nJump > 5) {
+		if (nJump <= 40 && nJump > 9) {
 			nFrame = 3;
 		}
         if (nJump > 29 && nJump <= 44) {
@@ -120,33 +113,46 @@ public class Main extends ApplicationAdapter {
 		else if (nJump <= 20 && nJump > 5) {
 			nY -= 5;
 		}
+		if (nJump > 44) {
+			if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+				nPunchUp = 49;
+				nJump = 0;
+			} else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+				nBlockUp = 49;
+				nJump = 0;
+			}
+		}
+		else if (nJump > 0 && Gdx.input.isKeyPressed(Input.Keys.E)){
+			nFrame = 14;
+		}
+
 
 		//PunchStraight structures
 		if (nPunchStraight > 5 && nPunchStraight <= 44) {
 			nFrame = 4;
 		}
 
-		//PunchDown structures
+		//txPunchDown structures
 		if (nPunchDown > 5 && nPunchDown <= 44) {
 			nFrame = 5;
 		}
 
-		//PunchUp structures
+		//txPunchUp structures
 		if (nPunchUp > 5 && nPunchUp <= 44) {
 			nFrame = 6;
 		}
 
-		//BlockStraight structures
+		//txBlockStraight structures
 		if (nBlockStraight > 5 && nBlockStraight <= 44) {
 			nFrame = 7;
 		}
 
-		//BlockDown structures
+		//txBlockDown structures
 		if (nBlockDown > 5 && nBlockDown <= 44) {
 			nFrame = 8;
 		}
 
-		//BlockUp structures
+		//txBlockUp structures
 		if (nBlockUp > 5 && nBlockUp <= 44) {
 			nFrame = 9;
 		}
@@ -195,64 +201,83 @@ public class Main extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
-		Idle1.dispose();
-		Idle2.dispose();
+		txIdle1.dispose();
+		txIdle2.dispose();
 	}
-	//Tomorrow work on flipping based on isRight
+
+	@Override
+	public void resize(int width, int height) {
+
+	}
+
+	@Override
+	public void pause() {
+
+	}
+
+	@Override
+	public void resume() {
+
+	}
+
+	@Override
+	public void hide() {
+
+	}
+
 	public void hero (int nIdle, int nX, int nY, int nFrame, boolean isRight) {
 		if (nFrame == 0){
-			if (nIdle <= 24) Active = Idle1;
-			if (nIdle > 24) Active = Idle2;
+			if (nIdle <= 24) txActive = txIdle1;
+			if (nIdle > 24) txActive = txIdle2;
 		}
 		if (nFrame == 1){
-			if (nIdle <= 24) Active = Walk1;
-			if (nIdle > 24) Active = Walk2;
+			if (nIdle <= 24) txActive = txWalk1;
+			if (nIdle > 24) txActive = txWalk2;
 		}
 		if (nFrame == 2){
-			Active = Crouch;
+			txActive = txCrouch;
 		}
 		if (nFrame == 3){
-			Active = Jump;
+			txActive = txJump;
 		}
 		if (nFrame == 4){
-			if (nIdle <= 24) Active = PunchStraight1;
-			if (nIdle > 24) Active = PunchStraight2;
+			if (nIdle <= 24) txActive = txPunchStraight1;
+			if (nIdle > 24) txActive = txPunchStraight2;
 		}
 		if (nFrame == 5){
-			Active = PunchDown;
+			txActive = txPunchDown;
 		}
 		if (nFrame == 6){
-			Active = PunchUp;
+			txActive = txPunchUp;
 		}
 		if (nFrame == 7){
-			Active = BlockStraight;
+			txActive = txBlockStraight;
 		}
 		if (nFrame == 8){
-			Active = BlockDown;
+			txActive = txBlockDown;
 		}
 		if (nFrame == 9){
-			Active = BlockUp;
+			txActive = txBlockUp;
 		}
 		if (nFrame == 10){
-			Active = KickStraight1;
+			txActive = txKickStraight1;
 		}
 		if (nFrame == 11){
-			Active = KickStraight2;
+			txActive = txKickStraight2;
 		}
 		if (nFrame == 12){
-			Active = KickLow1;
+			txActive = txKickLow1;
 		}
 		if (nFrame == 13){
-			Active = KickLow2;
+			txActive = txKickLow2;
 		}
 		if (nFrame == 14){
-			Active = KickJump;
+			txActive = txKickJump;
 		}
 		if (nFrame == 15){
-			Active = Dead;
+			txActive = txDead;
 		}
 		isRight = !isRight;
-		//The problem may be here
-		batch.draw(Active, nX, nY, 100, 250, 50, 0, 1, 1, isRight, false);
+		batch.draw(txActive, nX, nY, 100, 250, 0, 0, 2048, 3225, isRight, false);
 	}
 }
